@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Dados para enviar ao n8n
             const data = {
-                expert: 'Felipe Cota',
+                expert: 'COTA',
                 fbclid: fbclid
             };
             
