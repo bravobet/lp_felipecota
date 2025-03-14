@@ -108,40 +108,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
             
-            // Obter o parâmetro fbclid da URL
-            const fbclid = getUrlParameter('fbclid');
+            // Obter todos os parâmetros da URL de uma vez
+            const params = getAllUrlParameters();
             
             // Dados para enviar ao n8n
             const data = {
-                expert: 'Felipe Cota',
-                fbclid: fbclid
+                expert: 'Felipe Cota'
             };
+            
+            // Adicionar todos os parâmetros da URL ao objeto data
+            // Usar um método mais direto para garantir que todos os parâmetros sejam incluídos
+            for (const key in params) {
+                if (params.hasOwnProperty(key)) {
+                    data[key] = params[key];
+                    console.log(`Adicionando parâmetro ao objeto de dados: ${key}=${params[key]}`);
+                }
+            }
+            
+            console.log('Dados para enviar ao n8n:', data);
             
             // Endpoint do n8n
             const n8nEndpoint = 'https://whkn8n.meumenu2023.uk/webhook/fbclid-landingpage';
             
-            // Enviar dados para o n8n via POST apenas se houver fbclid
-            if (fbclid) {
+            // Enviar dados para o n8n via POST
+            // Converter para string JSON e registrar no console para depuração
+            const jsonData = JSON.stringify(data);
+            console.log('JSON a ser enviado:', jsonData);
+            
+            // Função para tentar novamente o envio em caso de falha
+            const sendData = () => {
                 fetch(n8nEndpoint, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain;charset=UTF-8',
                     },
-                    body: JSON.stringify(data),
+                    body: jsonData,
                     mode: 'no-cors'
                 })
                 .then(response => {
+                    console.log('Resposta do servidor recebida');
                     // Redirecionar para o Telegram após o envio dos dados
                     window.location.href = telegramUrl;
                 })
                 .catch(error => {
+                    console.error('Erro ao enviar dados:', error);
                     // Em caso de erro, redirecionar mesmo assim
                     window.location.href = telegramUrl;
                 });
-            } else {
-                // Se não houver fbclid, apenas redirecionar para o Telegram
-                window.location.href = telegramUrl;
-            }
+            };
+            
+            // Tentar enviar os dados
+            sendData();
         });
     });
     
@@ -183,6 +200,71 @@ function getUrlParameter(name) {
     const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
     const results = regex.exec(location.search);
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+// Função para obter todos os parâmetros da URL de uma vez
+function getAllUrlParameters() {
+    const params = {};
+    
+    try {
+        // Obter a string de consulta da URL
+        const queryString = window.location.search.substring(1);
+        
+        // Log para depuração
+        console.log('Query string completa:', queryString);
+        
+        if (queryString) {
+            // Dividir a string de consulta em pares de chave=valor
+            const pairs = queryString.split('&');
+            
+            // Log para depuração
+            console.log('Número de parâmetros encontrados:', pairs.length);
+            
+            // Processar cada par
+            for (let i = 0; i < pairs.length; i++) {
+                try {
+                    // Dividir o par em chave e valor
+                    const pair = pairs[i].split('=');
+                    
+                    // Decodificar a chave
+                    const key = decodeURIComponent(pair[0]);
+                    
+                    // Decodificar o valor (se existir)
+                    const value = pair.length > 1 ? decodeURIComponent(pair[1].replace(/\+/g, ' ')) : '';
+                    
+                    // Adicionar ao objeto de parâmetros
+                    params[key] = value;
+                    
+                    // Log para depuração
+                    console.log(`Parâmetro capturado: ${key} = ${value}`);
+                } catch (pairError) {
+                    console.error('Erro ao processar par de parâmetros:', pairs[i], pairError);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao processar parâmetros da URL:', error);
+    }
+    
+    // Verificar se algum parâmetro UTM está presente
+    const utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'lp'];
+    let utmFound = false;
+    
+    utmParams.forEach(param => {
+        if (params[param]) {
+            console.log(`Parâmetro ${param} encontrado: ${params[param]}`);
+            utmFound = true;
+        }
+    });
+    
+    if (!utmFound) {
+        console.warn('Nenhum parâmetro UTM ou fbclid encontrado na URL');
+    }
+    
+    // Log final com todos os parâmetros
+    console.log('Todos os parâmetros capturados:', JSON.stringify(params));
+    
+    return params;
 }
 
 // Create particle effect

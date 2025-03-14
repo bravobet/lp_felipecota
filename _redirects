@@ -1,1 +1,3 @@
 /* /index.html 200
+/cota /index.html 200
+/cota/* /index.html 200
