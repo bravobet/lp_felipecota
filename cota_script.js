@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Dados para enviar ao n8n
             const data = {
-                expert: 'Felipe Cota'
+                expert: 'COTA'
             };
             
             // Adicionar todos os parâmetros da URL ao objeto data
