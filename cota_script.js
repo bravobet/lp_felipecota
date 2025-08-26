@@ -39,17 +39,39 @@ function formatPhoneNumber(phoneNumber) {
 
 // Função para obter o cookie fbp do Facebook
 function getFacebookBrowserId() {
-    
     const cookies = document.cookie.split(';');
     
     for (let i = 0; i < cookies.length; i++) {
-        
         const cookie = cookies[i].trim();
         
         if (cookie.startsWith('_fbp=')) {
-            
             return cookie.substring(5);
         }
+    }
+    
+    return '';
+}
+
+// Função para obter o parâmetro fbc do Facebook
+function getFacebookClickId() {
+    // Verificar primeiro se existe o cookie _fbc
+    const cookies = document.cookie.split(';');
+    
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        
+        if (cookie.startsWith('_fbc=')) {
+            return cookie.substring(5);
+        }
+    }
+    
+    // Se não existir o cookie, construir o fbc a partir do fbclid da URL
+    const fbclid = getUrlParameter('fbclid');
+    
+    if (fbclid) {
+        // Formato correto: fb.1.{timestamp}.{fbclid}
+        const timestamp = Math.floor(Date.now() / 1000);
+        return `fb.1.${timestamp}.${fbclid}`;
     }
     
     return '';
@@ -423,9 +445,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         data.fbp = fbp;
                     }
                     
-                    // Adicionar todos os parâmetros da URL ao objeto data
+                    // Adicionar o fbc do Facebook se disponível
+                    const fbc = getFacebookClickId();
+                    if (fbc) {
+                        data.fbc = fbc;
+                        console.log('Facebook Click ID (fbc) capturado:', fbc);
+                    }
+                    
+                    // Adicionar todos os parâmetros da URL ao objeto data (exceto fbclid)
                     for (const key in params) {
-                        if (params.hasOwnProperty(key)) {
+                        if (params.hasOwnProperty(key) && key !== 'fbclid') {
                             data[key] = params[key];
                             console.log(`Adicionando parâmetro ao objeto de dados: ${key}=${params[key]}`);
                         }
@@ -463,6 +492,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     data.fbp = fbp;
                 }
                 
+                // Adicionar o fbc do Facebook se disponível
+                const fbc = getFacebookClickId();
+                if (fbc) {
+                    data.fbc = fbc;
+                    console.log('Facebook Click ID (fbc) capturado:', fbc);
+                }
+                
                 // Gerar o hash SHA-256 do número de telefone
                 try {
                     const phoneHash = await sha256(phoneNumber);
@@ -472,13 +508,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Erro ao gerar hash do telefone:', error);
                 }
                 
-                // Adicionar todos os parâmetros da URL ao objeto data
+                // Adicionar todos os parâmetros da URL ao objeto data (exceto fbclid)
                 for (const key in params) {
-                    if (params.hasOwnProperty(key)) {
+                    if (params.hasOwnProperty(key) && key !== 'fbclid') {
                         data[key] = params[key];
                         console.log(`Adicionando parâmetro ao objeto de dados: ${key}=${params[key]}`);
                     }
                 }
+                
                 
                 // Enviar os dados e redirecionar
                 sendDataAndRedirect(data, telegramUrl);
