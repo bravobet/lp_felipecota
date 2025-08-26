@@ -1,0 +1,141 @@
+/* Estilos para o popup de telefone */
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.popup-content {
+    background: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+    width: 90%;
+    max-width: 400px;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    animation: popup-appear 0.3s ease-out;
+}
+
+@keyframes popup-appear {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.popup-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.popup-header h3 {
+    font-size: 24px;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.popup-header p {
+    font-size: 16px;
+    color: #cccccc;
+}
+
+.popup-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.phone-input-container {
+    display: flex;
+    gap: 10px;
+}
+
+#phone-input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#phone-input:focus {
+    border-color: #ff0000;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+#submit-phone {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#submit-phone:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+}
+
+.timer-container {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.timer-container p {
+    font-size: 14px;
+    color: #aaaaaa;
+    margin-bottom: 8px;
+}
+
+#countdown-timer {
+    font-weight: 700;
+    color: #ff0000;
+}
+
+.progress-bar {
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+#progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0000, #cc0000);
+    width: 100%;
+    transition: width 1s linear;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    .popup-content {
+        padding: 20px;
+    }
+    
+    .phone-input-container {
+        flex-direction: column;
+    }
+    
+    #submit-phone {
+        margin-top: 10px;
+    }
+}
